@@ -1,0 +1,4 @@
+# AI巡检平台后端依赖
+flask>=3.0.0
+flask-cors>=4.0.0
+openpyxl>=3.1.0

@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI 巡检平台 Demo 1.0</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔍</text></svg>">
+  <link rel="stylesheet" href="src/style.css?v=13">
+</head>
+<body>
+  <div class="layout">
+    <!-- 侧边导航 -->
+    <aside class="sider">
+      <div class="sider-logo">
+        <h2>AI 巡检平台</h2>
+        <p>Demo 1.0 · 智能内容巡检</p>
+      </div>
+      <nav class="nav-menu">
+        <div class="nav-group-title">平台功能</div>
+        <div class="nav-item" data-page="task">
+          <span>巡检任务</span>
+        </div>
+        <div class="nav-item" data-page="result">
+          <span>巡检结果</span>
+        </div>
+        <div class="nav-item" data-page="capability">
+          <span>巡检能力</span>
+        </div>
+        <div class="nav-item" data-page="learning">
+          <span>AI自学习</span>
+        </div>
+      </nav>
+      <!-- 底部：用户信息 + 时间 + 后端状态 -->
+      <div class="sider-footer">
+        <div class="sider-footer-user">admin &nbsp;<span id="current-time" style="font-size:11px;opacity:0.7"></span></div>
+        <div style="font-size:11px;margin-top:4px">后端：<span id="backend-status" style="color:#ff4d4f">检测中...</span> <span style="opacity:0.4">localhost:5001</span></div>
+      </div>
+    </aside>
+
+    <!-- 主内容区（无顶部栏） -->
+    <div class="main-content" style="padding-top:0">
+      <!-- 页面内容 -->
+      <div id="page-content">
+        <div class="loading" style="padding:80px">
+          <div class="spinner"></div>
+          <p style="margin-top:12px">加载中，请确保后端服务已启动...</p>
+          <p style="font-size:12px;color:#aaa;margin-top:8px">启动命令：python3 backend/app.py</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal 容器 -->
+  <div id="modal-root"></div>
+
+  <!-- 脚本 -->
+  <script src="src/api.js?v=13"></script>
+  <script src="src/dataset.js?v=13"></script>
+  <script src="src/task.js?v=13"></script>
+  <script src="src/result.js?v=13"></script>
+  <script src="src/capability.js?v=13"></script>
+  <script src="src/learning.js?v=13"></script>
+  <script src="src/app.js?v=13"></script>
+
+  <script>
+    // 时钟
+    function updateTime() {
+      const el = document.getElementById('current-time');
+      if (el) el.textContent = new Date().toLocaleTimeString('zh-CN');
+    }
+    setInterval(updateTime, 1000);
+    updateTime();
+
+    // 健康检查
+    async function checkHealth() {
+      try {
+        const res = await fetch('http://localhost:5001/api/v1/health');
+        const data = await res.json();
+        if (data.code === 0) {
+          document.getElementById('backend-status').textContent = '正常';
+          document.getElementById('backend-status').style.color = '#52c41a';
+          Toast.success('后端服务运行正常');
+        }
+      } catch (e) {
+        document.getElementById('backend-status').textContent = '离线';
+        document.getElementById('backend-status').style.color = '#ff4d4f';
+        Toast.error('无法连接后端服务，请确保 python3 backend/app.py 已启动');
+      }
+    }
+
+    // 启动时检查后端状态
+    window.addEventListener('load', () => {
+      setTimeout(checkHealth, 1000);
+    });
+  </script>
+</body>
+</html>
